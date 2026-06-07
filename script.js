@@ -259,6 +259,9 @@ const renderChart = (node) => {
 };
 
 chartItems.forEach(renderChart);
+chartItems.forEach((chart) => {
+  if (chart.closest(".in-view")) chart.classList.add("chart-on");
+});
 
 const formatNumber = (value, decimals) =>
   new Intl.NumberFormat("zh-Hant", {
