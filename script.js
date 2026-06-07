@@ -237,7 +237,7 @@ const drawWordChart = (root, tone) => {
     const size = sizeFor(item.value);
     const opacity = Math.max(0.32, 1 - i * 0.032);
     const group = svgEl("g", {
-      class: `chart-word ${blue ? "blue" : "red"}`,
+      class: `chart-word ${blue ? "blue" : "red"}${i < 3 ? " top-rank" : ""}`,
       style: `--delay:${i * 95}ms; --word-opacity:${opacity}`,
       transform: `translate(${x} ${y}) rotate(${rotate})`,
     });
