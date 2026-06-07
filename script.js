@@ -49,7 +49,7 @@ const drawSubsidyRatio = (root) => {
     { year: "2025", total: "251,781", pct: 36.6 },
     { year: "2026", total: "226,406", pct: 44.8 },
   ];
-  const svg = makeSvg(980, 560);
+  const svg = makeSvg(980, 620);
   addText(svg, { x: 32, y: 44, class: "chart-title" }, "全市場歷年租屋物件：可租補 vs 一般物件比例變化");
   addText(svg, { x: 32, y: 76, class: "chart-note" }, "掃描範圍：全台 591 租屋網全量歷史貼文");
 
@@ -57,13 +57,13 @@ const drawSubsidyRatio = (root) => {
     const col = index % 3;
     const row = Math.floor(index / 3);
     const cx = 165 + col * 315;
-    const cy = 190 + row * 210;
+    const cy = 225 + row * 235;
     const r = 70;
     const start = 0;
     const end = (item.pct / 100) * 360;
     const group = svgEl("g", { style: `--delay:${index * 120}ms` });
-    group.appendChild(svgEl("circle", { cx, cy, r, fill: "#8c98ad", opacity: "0.72" }));
-    group.appendChild(svgEl("path", { d: arcPath(cx, cy, r, start, end), fill: "#e7213c", class: "chart-pie-wedge", style: `--delay:${index * 120}ms` }));
+    group.appendChild(svgEl("circle", { cx, cy, r, fill: "#79add2", opacity: "0.78" }));
+    group.appendChild(svgEl("path", { d: arcPath(cx, cy, r, start, end), fill: "#d9283f", class: "chart-pie-wedge", style: `--delay:${index * 120}ms` }));
     addText(group, { x: cx, y: cy - 8, "text-anchor": "middle", class: "chart-strong chart-pie-label", style: `--delay:${index * 120 + 240}ms` }, `${item.pct}%`);
     addText(group, { x: cx, y: cy + 17, "text-anchor": "middle", class: "chart-label chart-pie-label", style: `--delay:${index * 120 + 280}ms` }, "可租補");
     addText(group, { x: cx, y: cy - 102, "text-anchor": "middle", class: "chart-strong" }, `${item.year}年`);
@@ -117,37 +117,53 @@ const drawRentGrowth = (root) => {
 
 const drawRentBand = (root) => {
   const values = [14,107,364,774,761,813,648,601,498,378,499,399,283,241,149,122,133,78,94,57,58,55,26,47,21,12,23,15,22,22,8,16,9,8,9,4,6,2,4,5,4,3,2,2,3,1,8,1];
-  const svg = makeSvg(980, 520);
-  const left = 58;
-  const right = 938;
-  const top = 82;
-  const bottom = 430;
+  const bins = values
+    .map((value, index) => ({ value, from: 2 + index * 2, to: 4 + index * 2 }))
+    .filter((item) => item.from >= 2 && item.from < 60);
+  const svg = makeSvg(980, 600);
+  const left = 72;
+  const right = 930;
+  const top = 118;
+  const bottom = 475;
   const max = 850;
-  const barGap = 4;
-  const barWidth = (right - left) / values.length - barGap;
+  const barGap = 8;
+  const barWidth = (right - left) / bins.length - barGap;
   addText(svg, { x: 32, y: 44, class: "chart-title" }, "有漲物件之初始租金區間分布");
-  addText(svg, { x: 32, y: 72, class: "chart-note" }, "每 2,000 元級距，件數集中在 8,000 至 18,000 元");
+  addText(svg, { x: 32, y: 72, class: "chart-note" }, "每 2,000 元級距；畫面保留 2,000 至 60,000 元租金帶");
   [250, 500, 750].forEach((tick) => {
     const yy = bottom - (tick / max) * (bottom - top);
     svg.appendChild(svgEl("line", { x1: left, y1: yy, x2: right, y2: yy, class: "chart-grid" }));
     addText(svg, { x: left - 12, y: yy + 5, "text-anchor": "end", class: "chart-axis" }, tick);
   });
-  values.forEach((value, i) => {
+  bins.forEach(({ value, from }, i) => {
     const x = left + i * (barWidth + barGap);
     const height = (value / max) * (bottom - top);
     const y = bottom - height;
-    const isFocus = i >= 3 && i <= 8;
-    svg.appendChild(svgEl("rect", { x, y, width: barWidth, height, rx: 2, class: "chart-bar", fill: isFocus ? "#e7213c" : "#8c98ad", style: `--delay:${i * 18}ms` }));
-    if ([3, 4, 5, 6, 7, 10].includes(i)) {
-      addText(svg, { x: x + barWidth / 2, y: y - 8, "text-anchor": "middle", class: "chart-bar-label chart-strong", style: `--delay:${i * 18 + 280}ms` }, value);
+    const isFocus = from >= 8 && from < 18;
+    svg.appendChild(svgEl("rect", { x, y, width: barWidth, height, rx: 2, class: "chart-bar", fill: isFocus ? "#d9283f" : "#79add2", style: `--delay:${i * 18}ms` }));
+    if ((from >= 6 && from <= 24) || from === 28 || from === 34 || from === 40) {
+      const stagger = i % 2 ? 18 : 5;
+      addText(svg, { x: x + barWidth / 2, y: y - stagger, "text-anchor": "middle", class: "chart-bar-label chart-strong", style: `--delay:${i * 18 + 280}ms` }, value);
     }
   });
-  ["8k", "12k", "16k", "20k", "30k", "40k", "60k", "80k", "100k"].forEach((label, i) => {
-    const idx = [3,5,7,9,14,19,29,39,47][i];
-    addText(svg, { x: left + idx * (barWidth + barGap), y: bottom + 30, "text-anchor": "middle", class: "chart-axis" }, label);
+
+  const tickStarts = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 34, 40, 50, 58];
+  tickStarts.forEach((from) => {
+    const idx = bins.findIndex((item) => item.from === from);
+    if (idx < 0) return;
+    const x = left + idx * (barWidth + barGap) + barWidth / 2;
+    const label = from === 58 ? "58-60k" : `${from}-${from + 2}k`;
+    const text = addText(svg, { x, y: bottom + 36, "text-anchor": "end", class: "chart-axis" }, label);
+    text.setAttribute("transform", `rotate(-38 ${x} ${bottom + 36})`);
   });
-  svg.appendChild(svgEl("rect", { x: left + 3 * (barWidth + barGap) - 8, y: top + 8, width: 6 * (barWidth + barGap) + 10, height: bottom - top - 8, fill: "none", stroke: "#e7213c", "stroke-width": 2, "stroke-dasharray": "6 6", opacity: 0.55 }));
-  addText(svg, { x: left + 6 * (barWidth + barGap), y: top + 32, "text-anchor": "middle", class: "chart-strong chart-red" }, "8,000-18,000元");
+  addText(svg, { x: (left + right) / 2, y: 575, "text-anchor": "middle", class: "chart-axis" }, "初始月租金區間");
+
+  const focusStart = bins.findIndex((item) => item.from === 8);
+  const focusEnd = bins.findIndex((item) => item.from === 16);
+  const focusX = left + focusStart * (barWidth + barGap) - 8;
+  const focusWidth = (focusEnd - focusStart + 1) * (barWidth + barGap) + 8;
+  svg.appendChild(svgEl("rect", { x: focusX, y: top + 8, width: focusWidth, height: bottom - top - 8, fill: "none", stroke: "#d9283f", "stroke-width": 2, "stroke-dasharray": "7 7", opacity: 0.55 }));
+  addText(svg, { x: focusX + focusWidth / 2, y: top - 18, "text-anchor": "middle", class: "chart-strong chart-red" }, "8,000-18,000元最集中");
   root.appendChild(svg);
 };
 
@@ -155,40 +171,42 @@ const drawWordChart = (root, tone) => {
   const blue = tone === "blue";
   const items = blue
     ? [
-        ["獨立套房 + 精裝 + 近捷運 + 有電梯 + 不可寵", 39, 510, 130],
-        ["獨立套房 + 精裝 + 近捷運 + 無電梯 + 不可寵", 35, 510, 255],
-        ["獨立套房 + 中檔裝潢 + 近捷運 + 有電梯 + 不可寵", 31, 535, 375],
-        ["分租套房 + 中檔裝潢 + 近捷運 + 無電梯 + 不可寵", 24, 315, 202],
-        ["整層住家 + 基礎裝潢 + 近捷運 + 無電梯 + 可養寵", 24, 315, 475],
-        ["獨立套房 + 精裝 + 非捷運 + 無電梯 + 不可寵", 27, 372, 315],
-        ["整層住家 + 中檔裝潢 + 非捷運 + 有電梯 + 不可寵", 24, 665, 488],
-        ["分租套房 + 精裝 + 近捷運 + 無電梯 + 不可寵", 23, 715, 205],
+        ["獨立套房 + 精裝 + 近捷運 + 有電梯 + 不可寵", 54, 830, 160, 0, 0.82],
+        ["獨立套房 + 精裝 + 近捷運 + 無電梯 + 可養寵", 50, 760, 305, 0, 0.96],
+        ["獨立套房 + 中檔裝潢 + 近捷運 + 有電梯 + 不可寵", 45, 800, 430, 0, 0.96],
+        ["整層住家 + 基礎裝潢 + 近捷運 + 無電梯 + 可養寵", 36, 620, 585, 0, 0.72],
+        ["獨立套房 + 精裝 + 非捷運 + 無電梯 + 不可寵", 36, 500, 500, 0, 1],
+        ["分租套房 + 中檔裝潢 + 近捷運 + 無電梯 + 不可寵", 31, 1120, 250, 0, 0.36],
+        ["整層住家 + 中檔裝潢 + 非捷運 + 有電梯 + 不可寵", 32, 1035, 525, 0, 0.58],
+        ["分租套房 + 精裝 + 近捷運 + 無電梯 + 不可寵", 30, 405, 245, 0, 0.9],
+        ["獨立套房 + 中檔裝潢 + 非捷運 + 有電梯 + 不可寵", 29, 300, 360, 0, 0.85],
+        ["整層住家 + 中檔裝潢 + 非捷運 + 無電梯 + 不可寵", 30, 150, 452, -90, 0.8],
+        ["獨立套房 + 精裝 + 近捷運 + 無電梯 + 不可寵", 28, 960, 655, 0, 0.6],
+        ["整層住家 + 精裝 + 非捷運 + 有電梯 + 不可寵", 27, 315, 660, 0, 0.45],
       ]
     : [
-        ["整層住家 + 中檔裝潢 + 非捷運 + 有電梯 + 不可寵", 39, 505, 132],
-        ["整層住家 + 精裝 + 非捷運 + 有電梯 + 不可寵", 35, 520, 260],
-        ["整層住家 + 中檔裝潢 + 近捷運 + 無電梯 + 不可寵", 32, 520, 380],
-        ["獨立套房 + 中檔裝潢 + 近捷運 + 有電梯 + 不可寵", 27, 590, 485],
-        ["分租套房 + 精裝 + 近捷運 + 無電梯 + 不可寵", 24, 330, 202],
-        ["整層住家 + 基礎裝潢 + 非捷運 + 無電梯 + 可養寵", 27, 370, 500],
-        ["獨立套房 + 精裝 + 近捷運 + 無電梯 + 不可寵", 25, 700, 320],
+        ["整層住家 + 中檔裝潢 + 近捷運 + 無電梯 + 不可寵", 54, 760, 220, 0, 0.92],
+        ["整層住家 + 中檔裝潢 + 非捷運 + 有電梯 + 不可寵", 53, 765, 400, 0, 0.98],
+        ["整層住家 + 精裝 + 非捷運 + 有電梯 + 不可寵", 51, 735, 560, 0, 0.88],
+        ["獨立套房 + 中檔裝潢 + 近捷運 + 無電梯 + 不可寵", 42, 880, 120, 0, 0.88],
+        ["獨立套房 + 精裝 + 近捷運 + 有電梯 + 不可寵", 35, 455, 130, 0, 0.45],
+        ["分租套房 + 中檔裝潢 + 近捷運 + 無電梯 + 不可寵", 33, 370, 320, 0, 0.55],
+        ["獨立套房 + 精裝 + 近捷運 + 無電梯 + 可養寵", 32, 1040, 305, 0, 0.55],
+        ["整層住家 + 基礎裝潢 + 近捷運 + 無電梯 + 可養寵", 32, 400, 485, 0, 0.32],
+        ["獨立套房 + 精裝 + 非捷運 + 有電梯 + 不可寵", 31, 1010, 650, 0, 0.78],
+        ["獨立套房 + 基礎裝潢 + 近捷運 + 有電梯 + 不可寵", 29, 1100, 205, 0, 0.36],
+        ["分租套房 + 中檔裝潢 + 非捷運 + 無電梯 + 可養寵", 29, 315, 600, 0, 0.38],
       ];
-  const svg = makeSvg(980, 560);
-  addText(svg, { x: 32, y: 48, class: "chart-title" }, blue ? "8k-18k 有漲物件條件組合" : "2k-18k 易遭調漲組合排行");
-  addText(svg, { x: 32, y: 78, class: "chart-note" }, blue ? "字體越大代表受害數量／筆數越多" : "字體越大代表調漲幅度越高");
-  items.forEach(([text, size, x, y], i) => {
-    const parts = text.split(" + ");
-    const lines = [parts.slice(0, 3).join(" + "), parts.slice(3).join(" + ")];
-    const group = svgEl("g", { class: `chart-word ${blue ? "blue" : "red"}`, style: `--delay:${i * 120}ms`, transform: `translate(${x} ${y})` });
-    const estimatedWidth = Math.max(...lines.map((line) => line.length)) * size + 34;
-    const lineHeight = size * 1.18;
-    const boxHeight = lineHeight * 2 + 24;
-    group.appendChild(svgEl("rect", { x: -estimatedWidth / 2, y: -boxHeight / 2, width: estimatedWidth, height: boxHeight, rx: 8 }));
-    const textNode = svgEl("text", { "font-size": size });
-    lines.forEach((line, lineIndex) => {
-      textNode.appendChild(svgEl("tspan", { x: 0, y: (lineIndex - 0.5) * lineHeight + size * 0.18 }, line));
+  const svg = makeSvg(1500, 760);
+  addText(svg, { x: 40, y: 54, class: "chart-title" }, blue ? "8k-18k 有漲物件條件組合" : "2k-18k 易遭調漲組合排行");
+  addText(svg, { x: 40, y: 92, class: "chart-note" }, blue ? "字體越大代表受害數量／筆數越多" : "字體越大代表調漲幅度越高");
+  items.forEach(([text, size, x, y, rotate, opacity], i) => {
+    const group = svgEl("g", {
+      class: `chart-word ${blue ? "blue" : "red"}`,
+      style: `--delay:${i * 95}ms; --word-opacity:${opacity}`,
+      transform: `translate(${x} ${y}) rotate(${rotate})`,
     });
-    group.appendChild(textNode);
+    group.appendChild(svgEl("text", { "font-size": size }, text));
     svg.appendChild(group);
   });
   root.appendChild(svg);
