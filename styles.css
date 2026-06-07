@@ -498,10 +498,8 @@ figcaption {
 }
 
 .chart-viz.chart-on .chart-word.top-rank {
-  animation:
-    fadeWord 760ms ease forwards,
-    wordPulse 2100ms ease-in-out infinite;
-  animation-delay: var(--delay, 0ms), calc(var(--delay, 0ms) + 760ms);
+  animation: fadeWord 760ms ease forwards;
+  animation-delay: var(--delay, 0ms);
 }
 
 .chart-viz.chart-on .chart-pie-wedge {
@@ -527,6 +525,11 @@ figcaption {
   paint-order: stroke;
   stroke: rgba(255, 253, 250, 0.9);
   stroke-width: 3px;
+}
+
+.chart-viz.chart-on .chart-word.top-rank text {
+  animation: wordPulse 1500ms ease-in-out infinite;
+  animation-delay: calc(var(--delay, 0ms) + 760ms);
 }
 
 @keyframes drawLine {
@@ -564,11 +567,13 @@ figcaption {
 @keyframes wordPulse {
   0%,
   100% {
-    filter: drop-shadow(0 0 0 rgba(217, 40, 63, 0));
+    opacity: 1;
+    stroke-width: 3px;
   }
 
   50% {
-    filter: drop-shadow(0 0 12px rgba(217, 40, 63, 0.34));
+    opacity: 0.42;
+    stroke-width: 8px;
   }
 }
 
