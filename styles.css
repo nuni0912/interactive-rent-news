@@ -310,6 +310,20 @@ h3 {
 
 .chart-band.reverse .sticky-note {
   order: 2;
+  position: static;
+  top: auto;
+  padding: 0;
+  border-left: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.chart-band.reverse .sticky-note h2 {
+  font-size: clamp(28px, 3.6vw, 44px);
+}
+
+.chart-band.reverse .sticky-note .eyebrow {
+  margin-bottom: 12px;
 }
 
 .sticky-note {
