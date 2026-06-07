@@ -360,6 +360,191 @@ figcaption {
   padding: 0 18px 18px;
 }
 
+.chart-card {
+  --chart-bg: #fffdfa;
+  --chart-grid: rgba(23, 32, 55, 0.1);
+  --chart-text: #172037;
+  --chart-muted: #6d7789;
+  --chart-red: #e7213c;
+  --chart-red-soft: #ffedf0;
+  --chart-blue: #6faed1;
+  --chart-blue-dark: #173f66;
+}
+
+.chart-viz {
+  min-height: 430px;
+  padding: 24px;
+  color: var(--chart-text);
+  background:
+    radial-gradient(circle at 12% 18%, rgba(231, 33, 60, 0.08), transparent 28%),
+    radial-gradient(circle at 88% 80%, rgba(111, 174, 209, 0.13), transparent 30%),
+    var(--chart-bg);
+}
+
+.wide-chart .chart-viz,
+.word-card .chart-viz {
+  min-height: 540px;
+}
+
+.chart-viz svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chart-title {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: 0;
+  fill: var(--chart-text);
+}
+
+.chart-note,
+.chart-label,
+.chart-axis,
+.chart-legend {
+  fill: var(--chart-muted);
+  font-size: 14px;
+  letter-spacing: 0;
+}
+
+.chart-strong {
+  fill: var(--chart-text);
+  font-weight: 900;
+}
+
+.chart-red {
+  fill: var(--chart-red);
+  stroke: var(--chart-red);
+}
+
+.chart-blue {
+  fill: #8c98ad;
+  stroke: #8c98ad;
+}
+
+.chart-grid {
+  stroke: var(--chart-grid);
+  stroke-width: 1;
+}
+
+.chart-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 8;
+  stroke-dasharray: var(--line-length, 1);
+  stroke-dashoffset: var(--line-length, 1);
+}
+
+.chart-dot {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.3);
+}
+
+.chart-bar {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scaleY(0);
+}
+
+.chart-bar-label,
+.chart-pie-label,
+.chart-word {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: translateY(10px);
+}
+
+.chart-pie-wedge {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.72);
+}
+
+.chart-viz.chart-on .chart-line {
+  animation: drawLine 1300ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.chart-viz.chart-on .chart-dot {
+  animation: popDot 520ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.chart-viz.chart-on .chart-bar {
+  animation: growBar 840ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.chart-viz.chart-on .chart-bar-label,
+.chart-viz.chart-on .chart-pie-label,
+.chart-viz.chart-on .chart-word {
+  animation: fadeLift 620ms ease forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.chart-viz.chart-on .chart-pie-wedge {
+  animation: drawPie 920ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.chart-word text {
+  dominant-baseline: middle;
+  text-anchor: middle;
+  font-weight: 900;
+}
+
+.chart-word rect {
+  fill: rgba(255, 255, 255, 0.82);
+  stroke: rgba(23, 32, 55, 0.1);
+}
+
+.chart-word.red text {
+  fill: var(--chart-red-dark, #9f0614);
+}
+
+.chart-word.blue text {
+  fill: var(--chart-blue-dark);
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes popDot {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes growBar {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes fadeLift {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drawPie {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .focus-chart {
   padding: 36px 0 82px;
   background:
