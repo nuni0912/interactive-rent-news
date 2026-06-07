@@ -497,6 +497,13 @@ figcaption {
   animation-delay: var(--delay, 0ms);
 }
 
+.chart-viz.chart-on .chart-word.top-rank {
+  animation:
+    fadeWord 760ms ease forwards,
+    wordPulse 2100ms ease-in-out infinite;
+  animation-delay: var(--delay, 0ms), calc(var(--delay, 0ms) + 760ms);
+}
+
 .chart-viz.chart-on .chart-pie-wedge {
   animation: drawPie 920ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   animation-delay: var(--delay, 0ms);
@@ -514,6 +521,12 @@ figcaption {
 
 .chart-word.blue text {
   fill: var(--chart-blue-dark);
+}
+
+.chart-word.top-rank text {
+  paint-order: stroke;
+  stroke: rgba(255, 253, 250, 0.9);
+  stroke-width: 3px;
 }
 
 @keyframes drawLine {
@@ -545,6 +558,17 @@ figcaption {
 @keyframes fadeWord {
   to {
     opacity: var(--word-opacity, 1);
+  }
+}
+
+@keyframes wordPulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(217, 40, 63, 0));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 12px rgba(217, 40, 63, 0.34));
   }
 }
 
