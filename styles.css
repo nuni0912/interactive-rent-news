@@ -145,7 +145,7 @@ h1 {
 
 h2 {
   margin-bottom: 20px;
-  font-size: clamp(28px, 4vw, 52px);
+  font-size: clamp(27px, 3.35vw, 44px);
   line-height: 1.15;
   letter-spacing: 0;
 }
