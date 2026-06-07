@@ -636,55 +636,6 @@ figcaption {
   line-height: 1;
 }
 
-.route-lines {
-  position: relative;
-  left: 50%;
-  width: 100vw;
-  height: 132px;
-  margin: 58px 0 6px;
-  transform: translateX(-50%);
-  overflow: hidden;
-  border-radius: 0;
-  background:
-    linear-gradient(90deg, rgba(18, 27, 49, 0.04), rgba(231, 33, 60, 0.05), rgba(111, 174, 209, 0.07), rgba(18, 27, 49, 0.03)),
-    linear-gradient(180deg, transparent, rgba(18, 27, 49, 0.05), transparent);
-  pointer-events: none;
-}
-
-.route-lines span {
-  position: absolute;
-  left: -8%;
-  width: 116%;
-  height: 2px;
-  opacity: 0.42;
-  background: linear-gradient(90deg, transparent, var(--blue), rgba(255, 255, 255, 0.7), var(--red), transparent);
-  transform-origin: center;
-  animation: metro 6.4s ease-in-out infinite alternate;
-}
-
-.route-lines span:nth-child(1) {
-  top: 34%;
-  transform: rotate(2.8deg);
-}
-
-.route-lines span:nth-child(2) {
-  top: 50%;
-  transform: rotate(-2.2deg);
-  animation-delay: 0.4s;
-}
-
-.route-lines span:nth-child(3) {
-  top: 66%;
-  transform: rotate(3.8deg);
-  animation-delay: 0.9s;
-}
-
-.route-lines span:nth-child(4) {
-  top: 22%;
-  transform: rotate(-3.4deg);
-  animation-delay: 1.3s;
-}
-
 .word-stage {
   padding: 80px 0;
   background: linear-gradient(180deg, #eef7fb, #fff);
