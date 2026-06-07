@@ -365,10 +365,12 @@ figcaption {
   --chart-grid: rgba(23, 32, 55, 0.1);
   --chart-text: #172037;
   --chart-muted: #6d7789;
-  --chart-red: #e7213c;
-  --chart-red-soft: #ffedf0;
-  --chart-blue: #6faed1;
-  --chart-blue-dark: #173f66;
+  --chart-red: #d9283f;
+  --chart-red-dark: #9f0614;
+  --chart-red-soft: #fff0f2;
+  --chart-blue: #79add2;
+  --chart-blue-dark: #163f66;
+  --chart-blue-soft: #eaf5fb;
 }
 
 .chart-viz {
@@ -376,8 +378,8 @@ figcaption {
   padding: 24px;
   color: var(--chart-text);
   background:
-    radial-gradient(circle at 12% 18%, rgba(231, 33, 60, 0.08), transparent 28%),
-    radial-gradient(circle at 88% 80%, rgba(111, 174, 209, 0.13), transparent 30%),
+    radial-gradient(circle at 12% 18%, rgba(217, 40, 63, 0.08), transparent 28%),
+    radial-gradient(circle at 88% 80%, rgba(121, 173, 210, 0.16), transparent 30%),
     var(--chart-bg);
 }
 
@@ -420,8 +422,8 @@ figcaption {
 }
 
 .chart-blue {
-  fill: #8c98ad;
-  stroke: #8c98ad;
+  fill: var(--chart-blue);
+  stroke: var(--chart-blue);
 }
 
 .chart-grid {
@@ -452,12 +454,15 @@ figcaption {
 }
 
 .chart-bar-label,
-.chart-pie-label,
-.chart-word {
+.chart-pie-label {
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
   transform: translateY(10px);
+}
+
+.chart-word {
+  opacity: 0;
 }
 
 .chart-pie-wedge {
@@ -482,9 +487,13 @@ figcaption {
 }
 
 .chart-viz.chart-on .chart-bar-label,
-.chart-viz.chart-on .chart-pie-label,
-.chart-viz.chart-on .chart-word {
+.chart-viz.chart-on .chart-pie-label {
   animation: fadeLift 620ms ease forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+.chart-viz.chart-on .chart-word {
+  animation: fadeWord 760ms ease forwards;
   animation-delay: var(--delay, 0ms);
 }
 
@@ -497,11 +506,6 @@ figcaption {
   dominant-baseline: middle;
   text-anchor: middle;
   font-weight: 900;
-}
-
-.chart-word rect {
-  fill: rgba(255, 255, 255, 0.82);
-  stroke: rgba(23, 32, 55, 0.1);
 }
 
 .chart-word.red text {
@@ -535,6 +539,12 @@ figcaption {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes fadeWord {
+  to {
+    opacity: var(--word-opacity, 1);
   }
 }
 
