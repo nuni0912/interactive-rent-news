@@ -231,7 +231,7 @@ const drawWordChart = (root, tone) => {
   };
   const svg = makeSvg(1500, 820);
   addText(svg, { x: 40, y: 54, class: "chart-title" }, blue ? "8k-18k 有漲物件條件組合" : "2k-18k 易遭調漲組合排行");
-  addText(svg, { x: 40, y: 92, class: "chart-note" }, blue ? "字體越大代表受害數量／筆數越多" : "字體越大代表調漲幅度越高");
+  addText(svg, { x: 40, y: 92, class: "chart-note" }, blue ? "字體越大代表筆數越多" : "字體越大代表調漲幅度越高");
   data.forEach((item, i) => {
     const [x, y, rotate] = positions[i];
     const size = sizeFor(item.value);
