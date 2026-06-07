@@ -638,43 +638,50 @@ figcaption {
 
 .route-lines {
   position: relative;
-  height: 230px;
-  margin-top: 36px;
+  left: 50%;
+  width: 100vw;
+  height: 132px;
+  margin: 58px 0 6px;
+  transform: translateX(-50%);
   overflow: hidden;
-  border-radius: 8px;
-  background: #121b31;
+  border-radius: 0;
+  background:
+    linear-gradient(90deg, rgba(18, 27, 49, 0.04), rgba(231, 33, 60, 0.05), rgba(111, 174, 209, 0.07), rgba(18, 27, 49, 0.03)),
+    linear-gradient(180deg, transparent, rgba(18, 27, 49, 0.05), transparent);
+  pointer-events: none;
 }
 
 .route-lines span {
   position: absolute;
-  left: -12%;
-  width: 124%;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--blue), #fff, var(--red), transparent);
+  left: -8%;
+  width: 116%;
+  height: 2px;
+  opacity: 0.42;
+  background: linear-gradient(90deg, transparent, var(--blue), rgba(255, 255, 255, 0.7), var(--red), transparent);
   transform-origin: center;
-  animation: metro 4.8s ease-in-out infinite alternate;
+  animation: metro 6.4s ease-in-out infinite alternate;
 }
 
 .route-lines span:nth-child(1) {
-  top: 32%;
-  transform: rotate(8deg);
+  top: 34%;
+  transform: rotate(2.8deg);
 }
 
 .route-lines span:nth-child(2) {
   top: 50%;
-  transform: rotate(-5deg);
+  transform: rotate(-2.2deg);
   animation-delay: 0.4s;
 }
 
 .route-lines span:nth-child(3) {
-  top: 68%;
-  transform: rotate(14deg);
+  top: 66%;
+  transform: rotate(3.8deg);
   animation-delay: 0.9s;
 }
 
 .route-lines span:nth-child(4) {
-  top: 20%;
-  transform: rotate(-15deg);
+  top: 22%;
+  transform: rotate(-3.4deg);
   animation-delay: 1.3s;
 }
 
