@@ -876,6 +876,11 @@ footer a {
     font-size: 25px;
   }
 
+  .word-card .chart-viz {
+    min-height: 0;
+    padding: 16px;
+  }
+
   .method {
     width: calc(100% - 24px);
     padding: 28px;
