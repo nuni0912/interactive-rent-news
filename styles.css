@@ -881,6 +881,16 @@ footer a {
     padding: 16px;
   }
 
+  .word-card .chart-viz svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .word-card {
+    width: min(100% - 32px, 720px);
+  }
+
   .method {
     width: calc(100% - 24px);
     padding: 28px;
