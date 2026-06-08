@@ -145,7 +145,7 @@ h1 {
 
 h2 {
   margin-bottom: 20px;
-  font-size: clamp(27px, 3.35vw, 44px);
+  font-size: clamp(24px, 2.8vw, 36px);
   line-height: 1.15;
   letter-spacing: 0;
 }
@@ -285,6 +285,14 @@ h3 {
 .article p {
   margin-bottom: 1.25em;
   font-size: 19px;
+}
+
+.article p:last-child {
+  margin-bottom: 0;
+}
+
+.article.section + .article.section {
+  padding-top: 0;
 }
 
 .lead {
