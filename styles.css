@@ -876,17 +876,23 @@ footer a {
     font-size: 25px;
   }
 
+  .media-card .chart-viz,
+  .wide-chart .chart-viz,
   .word-card .chart-viz {
     min-height: 0;
     padding: 16px;
   }
 
+  .media-card .chart-viz svg,
+  .wide-chart .chart-viz svg,
   .word-card .chart-viz svg {
     display: block;
     width: 100%;
     height: auto;
   }
 
+  .media-card,
+  .wide-chart,
   .word-card {
     width: min(100% - 32px, 720px);
   }
