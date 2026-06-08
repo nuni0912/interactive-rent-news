@@ -651,13 +651,37 @@ figcaption {
 }
 
 blockquote {
+  position: relative;
   margin: 42px 0;
-  padding: 28px 0 28px 28px;
+  padding: 34px 0 34px 42px;
   border-left: 6px solid var(--blue);
   color: var(--blue-dark);
   font-size: clamp(23px, 3vw, 34px);
   font-weight: 800;
   line-height: 1.5;
+}
+
+blockquote::before,
+blockquote::after {
+  position: absolute;
+  color: rgba(111, 174, 209, 0.42);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(54px, 7vw, 92px);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+
+blockquote::before {
+  content: "“";
+  left: 18px;
+  top: -8px;
+}
+
+blockquote::after {
+  content: "”";
+  right: 4px;
+  bottom: -24px;
 }
 
 blockquote cite {
