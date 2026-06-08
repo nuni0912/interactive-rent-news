@@ -895,6 +895,17 @@ footer a {
   .wide-chart,
   .word-card {
     width: min(100% - 32px, 720px);
+    margin-inline: auto;
+  }
+
+  .chart-band .media-card {
+    width: min(100% - 32px, 720px);
+    justify-self: center;
+  }
+
+  .chart-band .media-card .chart-viz {
+    display: grid;
+    place-items: center;
   }
 
   .method {
