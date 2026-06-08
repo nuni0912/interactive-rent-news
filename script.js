@@ -259,9 +259,6 @@ const renderChart = (node) => {
 };
 
 chartItems.forEach(renderChart);
-chartItems.forEach((chart) => {
-  if (chart.closest(".in-view")) chart.classList.add("chart-on");
-});
 
 const formatNumber = (value, decimals) =>
   new Intl.NumberFormat("zh-Hant", {
@@ -270,15 +267,15 @@ const formatNumber = (value, decimals) =>
   }).format(value);
 
 const animateCounter = (node) => {
-  if (node.dataset.done) return;
-  node.dataset.done = "true";
-
   const target = Number(node.dataset.target);
   const decimals = String(node.dataset.target).includes(".") ? 1 : 0;
   const duration = 1200;
   const start = performance.now();
+  const runId = String(start);
+  node.dataset.runId = runId;
 
   const tick = (now) => {
+    if (node.dataset.runId !== runId) return;
     const progressValue = Math.min((now - start) / duration, 1);
     const eased = 1 - Math.pow(1 - progressValue, 3);
     node.textContent = formatNumber(target * eased, decimals);
@@ -291,13 +288,25 @@ const animateCounter = (node) => {
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("in-view");
-      entry.target.querySelectorAll(".count").forEach(animateCounter);
-      entry.target.querySelectorAll(".chart-viz").forEach((chart) => chart.classList.add("chart-on"));
+      const countersInSection = entry.target.querySelectorAll(".count");
+      const chartsInSection = entry.target.querySelectorAll(".chart-viz");
+
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in-view");
+        countersInSection.forEach(animateCounter);
+        chartsInSection.forEach((chart) => chart.classList.add("chart-on"));
+        return;
+      }
+
+      entry.target.classList.remove("in-view");
+      countersInSection.forEach((counter) => {
+        counter.dataset.runId = "";
+        counter.textContent = "0";
+      });
+      chartsInSection.forEach((chart) => chart.classList.remove("chart-on"));
     });
   },
-  { threshold: 0.18 }
+  { threshold: 0.12 }
 );
 
 revealItems.forEach((item) => observer.observe(item));
