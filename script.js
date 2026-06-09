@@ -171,24 +171,12 @@ const drawRentBand = (root) => {
 };
 
 const drawHotspotMap = (root) => {
-  const data = window.hotspotMapData;
   const svg = makeSvg(980, 690);
   addText(svg, { x: 32, y: 44, class: "chart-title" }, "2021 至 2024 年雙北租補物件租金漲幅熱點圖");
   addText(svg, { x: 32, y: 74, class: "chart-note" }, "資料來源：開放台灣民間租屋資料；紅點代表同物件追蹤後漲幅較高的物件");
 
-  if (!data) {
-    addText(svg, { x: 490, y: 345, "text-anchor": "middle", class: "chart-note" }, "地圖資料載入中");
-    root.appendChild(svg);
-    return;
-  }
-
-  const bounds = data.bounds;
   const left = 54;
-  const right = 875;
   const top = 94;
-  const bottom = 640;
-  const x = (lng) => left + ((lng - bounds.lngMin) / (bounds.lngMax - bounds.lngMin)) * (right - left);
-  const y = (lat) => bottom - ((lat - bounds.latMin) / (bounds.latMax - bounds.latMin)) * (bottom - top);
   const colorFor = (value) => {
     const t = Math.max(0, Math.min(value / 30, 1));
     const stops = [
@@ -204,53 +192,21 @@ const drawHotspotMap = (root) => {
     return `rgb(${rgb.join(",")})`;
   };
 
-  svg.appendChild(svgEl("rect", { x: left, y: top, width: right - left, height: bottom - top, rx: 18, fill: "#f7f9fb", stroke: "rgba(23,32,55,0.08)" }));
-  const mapClipId = `hotspot-map-clip-${Math.random().toString(36).slice(2)}`;
-  const mapDefs = svgEl("defs");
-  const mapClip = svgEl("clipPath", { id: mapClipId });
-  mapClip.appendChild(svgEl("rect", { x: left, y: top, width: right - left, height: bottom - top, rx: 18 }));
-  mapDefs.appendChild(mapClip);
-  svg.appendChild(mapDefs);
-  const mapLayer = svgEl("g", { "clip-path": `url(#${mapClipId})` });
-
-  if (Array.isArray(data.boundaries)) {
-    data.boundaries.forEach((ring) => {
-      const d = ring
-        .map((point, index) => `${index ? "L" : "M"} ${x(point[0]).toFixed(1)} ${y(point[1]).toFixed(1)}`)
-        .join(" ");
-      mapLayer.appendChild(svgEl("path", { d: `${d} Z`, class: "chart-map-boundary" }));
-    });
-  } else {
-    [0.25, 0.5, 0.75].forEach((ratio) => {
-      const xx = left + (right - left) * ratio;
-      const yy = top + (bottom - top) * ratio;
-      mapLayer.appendChild(svgEl("line", { x1: xx, y1: top, x2: xx, y2: bottom, class: "chart-grid" }));
-      mapLayer.appendChild(svgEl("line", { x1: left, y1: yy, x2: right, y2: yy, class: "chart-grid" }));
-    });
-  }
-
-  data.lines.forEach((line) => {
-    const d = line.coords.map((point, index) => `${index ? "L" : "M"} ${x(point[0]).toFixed(1)} ${y(point[1]).toFixed(1)}`).join(" ");
-    mapLayer.appendChild(svgEl("path", { d, fill: "none", stroke: line.color, "stroke-width": 3.2, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.82, class: "chart-map-line" }));
-  });
-
   const years = ["2021", "2022", "2023", "2024"];
-  const yearlyGroups = years.map((year) => {
-    const group = svgEl("g", { class: "chart-map-year", "data-year": year });
-    const points = data.pointsByYear?.[year] || [];
-    points.forEach((point) => {
-      group.appendChild(svgEl("circle", {
-        cx: x(point[0]).toFixed(1),
-        cy: y(point[1]).toFixed(1),
-        r: (1.45 + (point[2] / 30) * 2.6).toFixed(2),
-        fill: colorFor(point[2]),
-        class: "chart-map-point",
-      }));
-    });
-    mapLayer.appendChild(group);
-    return group;
+  const images = years.map((year) => `assets/hotspot_map_${year}.png`);
+  images.forEach((src) => {
+    const preloaded = new Image();
+    preloaded.src = src;
   });
-  svg.appendChild(mapLayer);
+  const mapImage = svgEl("image", {
+    x: 0,
+    y: 0,
+    width: 980,
+    height: 690,
+    href: images[0],
+    class: "chart-map-image",
+  });
+  svg.appendChild(mapImage);
 
   const yearLabel = addText(svg, { x: left + 22, y: top + 42, class: "chart-map-year-label" }, "滾動疊加：2021");
 
@@ -276,7 +232,9 @@ const drawHotspotMap = (root) => {
   addText(svg, { x: legendX + 9, y: legendY - 16, "text-anchor": "middle", class: "chart-label" }, "漲幅");
 
   root.appendChild(svg);
-  root._hotspotYears = yearlyGroups;
+  root._hotspotImages = images;
+  root._hotspotYears = years;
+  root._hotspotImage = mapImage;
   root._hotspotYearLabel = yearLabel;
   root._hotspotVisibleYears = 0;
 };
@@ -379,29 +337,25 @@ chartItems.forEach(renderChart);
 const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
 
 const setHotspotVisibleYears = (chart, count) => {
-  const groups = chart._hotspotYears;
-  if (!groups || !groups.length) return;
+  const years = chart._hotspotYears;
+  const images = chart._hotspotImages;
+  if (!years || !years.length || !images || !images.length || !chart._hotspotImage) return;
   const previous = chart._hotspotVisibleYears || 0;
-  const next = clamp(count, 0, groups.length);
+  const next = clamp(count, 1, years.length);
   if (next === previous) return;
 
-  if (next > previous) {
-    for (let i = previous; i < next; i += 1) groups[i].classList.add("is-visible");
-  } else {
-    for (let i = next; i < previous; i += 1) groups[i].classList.remove("is-visible");
-  }
-
   chart._hotspotVisibleYears = next;
+  chart._hotspotImage.setAttribute("href", images[next - 1]);
   if (chart._hotspotYearLabel) {
-    const lastVisible = groups[Math.max(0, next - 1)]?.dataset.year || "2021";
+    const lastVisible = years[next - 1] || "2021";
     chart._hotspotYearLabel.textContent = next ? `滾動疊加：2021-${lastVisible}` : "滾動疊加：2021";
   }
 };
 
 const updateHotspotMaps = () => {
   document.querySelectorAll('[data-chart="hotspot-map"]').forEach((chart) => {
-    const groups = chart._hotspotYears;
-    if (!groups || !groups.length) return;
+    const years = chart._hotspotYears;
+    if (!years || !years.length) return;
     const scroller = chart.closest(".hotspot-scroll");
     let ratio = 0;
 
@@ -418,7 +372,7 @@ const updateHotspotMaps = () => {
       ratio = clamp((start - rect.top) / (start - end), 0, 1);
     }
 
-    setHotspotVisibleYears(chart, Math.max(1, Math.ceil(ratio * groups.length)));
+    setHotspotVisibleYears(chart, Math.max(1, Math.ceil(ratio * years.length)));
   });
 };
 
