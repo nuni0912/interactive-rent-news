@@ -53,7 +53,7 @@ const drawSubsidyRatio = (root) => {
   ];
   const svg = makeSvg(980, 620);
   addText(svg, { x: 32, y: 44, class: "chart-title" }, "全市場歷年租屋物件：可租補 vs 一般物件比例變化");
-  addText(svg, { x: 32, y: 76, class: "chart-note" }, "資料來源：開放台灣民間租屋資料");
+  addText(svg, { x: 32, y: 76, class: "chart-note" }, "資料來源：591歷年刊登資料");
 
   data.forEach((item, index) => {
     const col = index % 3;
@@ -235,7 +235,8 @@ const drawWordChart = (root, tone) => {
   addText(svg, { x: 40, y: 54, class: "chart-title" }, blue ? "8k-18k 有漲物件條件組合" : "2k-18k 易遭調漲組合排行");
   addText(svg, { x: 40, y: 92, class: "chart-note" }, blue ? "字體越大代表筆數越多" : "字體越大代表調漲幅度越高");
   data.forEach((item, i) => {
-    const [x, y] = positions[i];
+    const [baseX, y] = positions[i];
+    const x = blue ? baseX + 85 : baseX;
     const size = sizeFor(item.value);
     const opacity = Math.max(0.32, 1 - i * 0.032);
     const group = svgEl("g", {
