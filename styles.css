@@ -534,26 +534,6 @@ figcaption {
   transform: scale(0.72);
 }
 
-.chart-map-line {
-  filter: drop-shadow(0 1px 1px rgba(23, 32, 55, 0.18));
-}
-
-.chart-map-boundary {
-  fill: rgba(255, 255, 255, 0.52);
-  stroke: rgba(23, 32, 55, 0.2);
-  stroke-width: 1.1;
-  stroke-linejoin: round;
-}
-
-.chart-map-year {
-  opacity: 0;
-  transition: opacity 180ms ease;
-}
-
-.chart-map-year.is-visible {
-  opacity: 1;
-}
-
 .chart-map-year-label {
   font-size: 18px;
   font-weight: 900;
@@ -563,10 +543,8 @@ figcaption {
   stroke-width: 5px;
 }
 
-.chart-map-point {
-  opacity: 0.86;
-  stroke: rgba(255, 255, 255, 0.72);
-  stroke-width: 0.65;
+.chart-map-image {
+  image-rendering: auto;
 }
 
 .chart-viz.chart-on .chart-line {
