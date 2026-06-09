@@ -143,6 +143,30 @@ h1 {
   letter-spacing: 0;
 }
 
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 0 22px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.byline span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.byline span + span::before {
+  content: "";
+  width: 1px;
+  height: 0.9em;
+  margin-right: 18px;
+  background: rgba(255, 255, 255, 0.24);
+}
+
 h2 {
   margin-bottom: 20px;
   font-size: clamp(24px, 2.8vw, 36px);
@@ -843,6 +867,15 @@ footer a {
 
   .hero-inner {
     width: min(100% - 28px, 640px);
+  }
+
+  .byline {
+    gap: 4px 12px;
+    font-size: 14px;
+  }
+
+  .byline span + span::before {
+    margin-right: 12px;
   }
 
   .hero-stats,
