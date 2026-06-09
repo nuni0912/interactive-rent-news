@@ -3,6 +3,8 @@ const revealItems = document.querySelectorAll(".reveal");
 const counters = document.querySelectorAll(".count");
 const tiltItems = document.querySelectorAll(".tilt");
 const chartItems = document.querySelectorAll(".chart-viz");
+const topbar = document.querySelector(".topbar");
+let lastScrollY = window.scrollY;
 
 const svgNS = "http://www.w3.org/2000/svg";
 const makeSvg = (width, height) => {
@@ -51,7 +53,7 @@ const drawSubsidyRatio = (root) => {
   ];
   const svg = makeSvg(980, 620);
   addText(svg, { x: 32, y: 44, class: "chart-title" }, "全市場歷年租屋物件：可租補 vs 一般物件比例變化");
-  addText(svg, { x: 32, y: 76, class: "chart-note" }, "掃描範圍：全台 591 租屋網全量歷史貼文");
+  addText(svg, { x: 32, y: 76, class: "chart-note" }, "資料來源：開放台灣民間租屋資料");
 
   data.forEach((item, index) => {
     const col = index % 3;
@@ -318,6 +320,18 @@ const updateProgress = () => {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const ratio = max > 0 ? window.scrollY / max : 0;
   progress.style.width = `${Math.min(ratio * 100, 100)}%`;
+
+  if (!topbar) return;
+  const currentY = window.scrollY;
+  const delta = currentY - lastScrollY;
+
+  if (currentY < 80 || delta < -6) {
+    topbar.classList.remove("is-hidden");
+  } else if (delta > 6) {
+    topbar.classList.add("is-hidden");
+  }
+
+  lastScrollY = currentY;
 };
 
 window.addEventListener("scroll", updateProgress, { passive: true });
