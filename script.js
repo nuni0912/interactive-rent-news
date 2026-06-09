@@ -219,20 +219,23 @@ const drawWordChart = (root, tone) => {
   const values = data.map((item) => item.value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
-  const minSize = 21;
-  const maxSize = blue ? 38 : 37;
+  const minSize = 18;
+  const maxSize = blue ? 33 : 32;
   const sizeFor = (value) => {
     const ratio = (Math.sqrt(value) - Math.sqrt(minValue)) / (Math.sqrt(maxValue) - Math.sqrt(minValue));
     return minSize + ratio * (maxSize - minSize);
   };
-  const svg = makeSvg(1500, 820);
+  const positions = [
+    [150, 150], [865, 205], [225, 265], [940, 325], [165, 385],
+    [925, 445], [290, 505], [1010, 565], [155, 625], [850, 685],
+    [315, 745], [980, 805], [170, 865], [865, 925], [285, 985],
+    [1000, 1045], [150, 1105], [900, 1165], [315, 1225], [980, 1285],
+  ];
+  const svg = makeSvg(1700, 1360);
   addText(svg, { x: 40, y: 54, class: "chart-title" }, blue ? "8k-18k 有漲物件條件組合" : "2k-18k 易遭調漲組合排行");
   addText(svg, { x: 40, y: 92, class: "chart-note" }, blue ? "字體越大代表筆數越多" : "字體越大代表調漲幅度越高");
   data.forEach((item, i) => {
-    const col = i % 2;
-    const row = Math.floor(i / 2);
-    const x = col === 0 ? 58 : 772;
-    const y = 145 + row * 63;
+    const [x, y] = positions[i];
     const size = sizeFor(item.value);
     const opacity = Math.max(0.32, 1 - i * 0.032);
     const group = svgEl("g", {
@@ -240,14 +243,7 @@ const drawWordChart = (root, tone) => {
       style: `--delay:${i * 95}ms; --word-opacity:${opacity}`,
       transform: `translate(${x} ${y})`,
     });
-    const label = svgEl("text", { "font-size": size.toFixed(1), "text-anchor": "start" }, item.text);
-    group.appendChild(label);
-    group.appendChild(svgEl("text", {
-      x: col === 0 ? 650 : 1378,
-      "font-size": Math.max(18, size * 0.72).toFixed(1),
-      "text-anchor": "end",
-      class: "chart-word-value",
-    }, blue ? `${item.value}筆` : `${item.value.toFixed(1)}%`));
+    group.appendChild(svgEl("text", { "font-size": size.toFixed(1), "text-anchor": "start" }, item.text));
     svg.appendChild(group);
   });
   root.appendChild(svg);
