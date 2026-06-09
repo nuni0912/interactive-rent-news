@@ -361,7 +361,7 @@ const updateHotspotMaps = () => {
 
     if (scroller) {
       const rect = scroller.getBoundingClientRect();
-      const pinTop = Math.min(84, window.innerHeight * 0.12);
+      const pinTop = parseFloat(getComputedStyle(scroller).getPropertyValue("--hotspot-sticky-top")) || Math.min(84, window.innerHeight * 0.12);
       const cssDistance = parseFloat(getComputedStyle(scroller).getPropertyValue("--hotspot-scroll-distance"));
       const scrollDistance = Math.max(cssDistance || scroller.offsetHeight - window.innerHeight, 1);
       ratio = clamp((pinTop - rect.top) / scrollDistance, 0, 1);
@@ -380,7 +380,17 @@ const scheduleHotspotUpdate = () => {
   if (hotspotFrame) return;
   hotspotFrame = requestAnimationFrame(() => {
     hotspotFrame = 0;
+    updateHotspotStickyTop();
     updateHotspotMaps();
+  });
+};
+
+const updateHotspotStickyTop = () => {
+  document.querySelectorAll(".hotspot-scroll").forEach((section) => {
+    const card = section.querySelector(".wide-chart");
+    if (!card) return;
+    const top = Math.max(18, (window.innerHeight - card.offsetHeight) / 2);
+    section.style.setProperty("--hotspot-sticky-top", `${Math.round(top)}px`);
   });
 };
 
