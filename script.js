@@ -5,6 +5,7 @@ const tiltItems = document.querySelectorAll(".tilt");
 const chartItems = document.querySelectorAll(".chart-viz");
 const topbar = document.querySelector(".topbar");
 let lastScrollY = window.scrollY;
+let hotspotFrame = 0;
 
 const svgNS = "http://www.w3.org/2000/svg";
 const makeSvg = (width, height) => {
@@ -169,6 +170,117 @@ const drawRentBand = (root) => {
   root.appendChild(svg);
 };
 
+const drawHotspotMap = (root) => {
+  const data = window.hotspotMapData;
+  const svg = makeSvg(980, 690);
+  addText(svg, { x: 32, y: 44, class: "chart-title" }, "2021 至 2024 年雙北租補物件租金漲幅熱點圖");
+  addText(svg, { x: 32, y: 74, class: "chart-note" }, "資料來源：開放台灣民間租屋資料；紅點代表同物件追蹤後漲幅較高的物件");
+
+  if (!data) {
+    addText(svg, { x: 490, y: 345, "text-anchor": "middle", class: "chart-note" }, "地圖資料載入中");
+    root.appendChild(svg);
+    return;
+  }
+
+  const bounds = data.bounds;
+  const left = 54;
+  const right = 875;
+  const top = 94;
+  const bottom = 640;
+  const x = (lng) => left + ((lng - bounds.lngMin) / (bounds.lngMax - bounds.lngMin)) * (right - left);
+  const y = (lat) => bottom - ((lat - bounds.latMin) / (bounds.latMax - bounds.latMin)) * (bottom - top);
+  const colorFor = (value) => {
+    const t = Math.max(0, Math.min(value / 30, 1));
+    const stops = [
+      [255, 240, 232],
+      [255, 159, 132],
+      [237, 60, 60],
+      [128, 20, 34],
+    ];
+    const scaled = t * (stops.length - 1);
+    const i = Math.min(Math.floor(scaled), stops.length - 2);
+    const local = scaled - i;
+    const rgb = stops[i].map((start, channel) => Math.round(start + (stops[i + 1][channel] - start) * local));
+    return `rgb(${rgb.join(",")})`;
+  };
+
+  svg.appendChild(svgEl("rect", { x: left, y: top, width: right - left, height: bottom - top, rx: 18, fill: "#f7f9fb", stroke: "rgba(23,32,55,0.08)" }));
+  const mapClipId = `hotspot-map-clip-${Math.random().toString(36).slice(2)}`;
+  const mapDefs = svgEl("defs");
+  const mapClip = svgEl("clipPath", { id: mapClipId });
+  mapClip.appendChild(svgEl("rect", { x: left, y: top, width: right - left, height: bottom - top, rx: 18 }));
+  mapDefs.appendChild(mapClip);
+  svg.appendChild(mapDefs);
+  const mapLayer = svgEl("g", { "clip-path": `url(#${mapClipId})` });
+
+  if (Array.isArray(data.boundaries)) {
+    data.boundaries.forEach((ring) => {
+      const d = ring
+        .map((point, index) => `${index ? "L" : "M"} ${x(point[0]).toFixed(1)} ${y(point[1]).toFixed(1)}`)
+        .join(" ");
+      mapLayer.appendChild(svgEl("path", { d: `${d} Z`, class: "chart-map-boundary" }));
+    });
+  } else {
+    [0.25, 0.5, 0.75].forEach((ratio) => {
+      const xx = left + (right - left) * ratio;
+      const yy = top + (bottom - top) * ratio;
+      mapLayer.appendChild(svgEl("line", { x1: xx, y1: top, x2: xx, y2: bottom, class: "chart-grid" }));
+      mapLayer.appendChild(svgEl("line", { x1: left, y1: yy, x2: right, y2: yy, class: "chart-grid" }));
+    });
+  }
+
+  data.lines.forEach((line) => {
+    const d = line.coords.map((point, index) => `${index ? "L" : "M"} ${x(point[0]).toFixed(1)} ${y(point[1]).toFixed(1)}`).join(" ");
+    mapLayer.appendChild(svgEl("path", { d, fill: "none", stroke: line.color, "stroke-width": 3.2, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.82, class: "chart-map-line" }));
+  });
+
+  const years = ["2021", "2022", "2023", "2024"];
+  const yearlyGroups = years.map((year) => {
+    const group = svgEl("g", { class: "chart-map-year", "data-year": year });
+    const points = data.pointsByYear?.[year] || [];
+    points.forEach((point) => {
+      group.appendChild(svgEl("circle", {
+        cx: x(point[0]).toFixed(1),
+        cy: y(point[1]).toFixed(1),
+        r: (1.45 + (point[2] / 30) * 2.6).toFixed(2),
+        fill: colorFor(point[2]),
+        class: "chart-map-point",
+      }));
+    });
+    mapLayer.appendChild(group);
+    return group;
+  });
+  svg.appendChild(mapLayer);
+
+  const yearLabel = addText(svg, { x: left + 22, y: top + 42, class: "chart-map-year-label" }, "滾動疊加：2021");
+
+  const legendX = 912;
+  const legendY = 180;
+  const gradId = `hotspot-gradient-${Math.random().toString(36).slice(2)}`;
+  const defs = svgEl("defs");
+  const gradient = svgEl("linearGradient", { id: gradId, x1: "0", y1: "1", x2: "0", y2: "0" });
+  [
+    ["0%", colorFor(0)],
+    ["35%", colorFor(10)],
+    ["70%", colorFor(20)],
+    ["100%", colorFor(30)],
+  ].forEach(([offset, color]) => gradient.appendChild(svgEl("stop", { offset, "stop-color": color })));
+  defs.appendChild(gradient);
+  svg.appendChild(defs);
+  svg.appendChild(svgEl("rect", { x: legendX, y: legendY, width: 18, height: 270, fill: `url(#${gradId})`, stroke: "rgba(23,32,55,0.18)" }));
+  [0, 10, 20, 30].forEach((tick) => {
+    const yy = legendY + 270 - (tick / 30) * 270;
+    svg.appendChild(svgEl("line", { x1: legendX + 18, y1: yy, x2: legendX + 24, y2: yy, stroke: "rgba(23,32,55,0.42)" }));
+    addText(svg, { x: legendX + 30, y: yy + 5, class: "chart-axis" }, `${tick}%`);
+  });
+  addText(svg, { x: legendX + 9, y: legendY - 16, "text-anchor": "middle", class: "chart-label" }, "漲幅");
+
+  root.appendChild(svg);
+  root._hotspotYears = yearlyGroups;
+  root._hotspotYearLabel = yearLabel;
+  root._hotspotVisibleYears = 0;
+};
+
 const drawWordChart = (root, tone) => {
   const blue = tone === "blue";
   const data = blue
@@ -256,12 +368,67 @@ const renderChart = (node) => {
   const type = node.dataset.chart;
   if (type === "subsidy-ratio") drawSubsidyRatio(node);
   if (type === "rent-growth") drawRentGrowth(node);
+  if (type === "hotspot-map") drawHotspotMap(node);
   if (type === "rent-band") drawRentBand(node);
   if (type === "combo-count") drawWordChart(node, "blue");
   if (type === "combo-growth") drawWordChart(node, "red");
 };
 
 chartItems.forEach(renderChart);
+
+const clamp = (value, min, max) => Math.max(min, Math.min(value, max));
+
+const setHotspotVisibleYears = (chart, count) => {
+  const groups = chart._hotspotYears;
+  if (!groups || !groups.length) return;
+  const previous = chart._hotspotVisibleYears || 0;
+  const next = clamp(count, 0, groups.length);
+  if (next === previous) return;
+
+  if (next > previous) {
+    for (let i = previous; i < next; i += 1) groups[i].classList.add("is-visible");
+  } else {
+    for (let i = next; i < previous; i += 1) groups[i].classList.remove("is-visible");
+  }
+
+  chart._hotspotVisibleYears = next;
+  if (chart._hotspotYearLabel) {
+    const lastVisible = groups[Math.max(0, next - 1)]?.dataset.year || "2021";
+    chart._hotspotYearLabel.textContent = next ? `滾動疊加：2021-${lastVisible}` : "滾動疊加：2021";
+  }
+};
+
+const updateHotspotMaps = () => {
+  document.querySelectorAll('[data-chart="hotspot-map"]').forEach((chart) => {
+    const groups = chart._hotspotYears;
+    if (!groups || !groups.length) return;
+    const scroller = chart.closest(".hotspot-scroll");
+    let ratio = 0;
+
+    if (scroller) {
+      const rect = scroller.getBoundingClientRect();
+      const pinTop = Math.min(84, window.innerHeight * 0.12);
+      const cssDistance = parseFloat(getComputedStyle(scroller).getPropertyValue("--hotspot-scroll-distance"));
+      const scrollDistance = Math.max(cssDistance || scroller.offsetHeight - window.innerHeight, 1);
+      ratio = clamp((pinTop - rect.top) / scrollDistance, 0, 1);
+    } else {
+      const rect = chart.getBoundingClientRect();
+      const start = window.innerHeight * 0.92;
+      const end = -rect.height * 0.12;
+      ratio = clamp((start - rect.top) / (start - end), 0, 1);
+    }
+
+    setHotspotVisibleYears(chart, Math.max(1, Math.ceil(ratio * groups.length)));
+  });
+};
+
+const scheduleHotspotUpdate = () => {
+  if (hotspotFrame) return;
+  hotspotFrame = requestAnimationFrame(() => {
+    hotspotFrame = 0;
+    updateHotspotMaps();
+  });
+};
 
 const formatNumber = (value, decimals) =>
   new Intl.NumberFormat("zh-Hant", {
@@ -321,6 +488,7 @@ const updateProgress = () => {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const ratio = max > 0 ? window.scrollY / max : 0;
   progress.style.width = `${Math.min(ratio * 100, 100)}%`;
+  scheduleHotspotUpdate();
 
   if (!topbar) return;
   const currentY = window.scrollY;
@@ -336,6 +504,7 @@ const updateProgress = () => {
 };
 
 window.addEventListener("scroll", updateProgress, { passive: true });
+window.addEventListener("resize", scheduleHotspotUpdate);
 updateProgress();
 
 tiltItems.forEach((item) => {
