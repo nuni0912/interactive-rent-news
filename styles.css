@@ -534,6 +534,41 @@ figcaption {
   transform: scale(0.72);
 }
 
+.chart-map-line {
+  filter: drop-shadow(0 1px 1px rgba(23, 32, 55, 0.18));
+}
+
+.chart-map-boundary {
+  fill: rgba(255, 255, 255, 0.52);
+  stroke: rgba(23, 32, 55, 0.2);
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+}
+
+.chart-map-year {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.chart-map-year.is-visible {
+  opacity: 1;
+}
+
+.chart-map-year-label {
+  font-size: 18px;
+  font-weight: 900;
+  fill: var(--chart-blue-dark);
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.88);
+  stroke-width: 5px;
+}
+
+.chart-map-point {
+  opacity: 0.86;
+  stroke: rgba(255, 255, 255, 0.72);
+  stroke-width: 0.65;
+}
+
 .chart-viz.chart-on .chart-line {
   animation: drawLine 1300ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -632,6 +667,36 @@ figcaption {
   background:
     linear-gradient(90deg, transparent 0 8%, rgba(231, 33, 60, 0.07) 8% 36%, transparent 36%),
     var(--soft);
+}
+
+.hotspot-scroll {
+  --hotspot-scroll-distance: 520px;
+  min-height: calc(100vh + var(--hotspot-scroll-distance));
+  padding: 0;
+}
+
+.focus-chart.hotspot-scroll.reveal,
+.focus-chart.hotspot-scroll.reveal.in-view {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.hotspot-scroll .wide-chart {
+  position: sticky;
+  top: 70px;
+  padding: 34px 0 42px;
+}
+
+.hotspot-scroll .chart-viz {
+  display: grid;
+  place-items: center;
+}
+
+.hotspot-scroll .chart-viz svg {
+  width: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 190px);
 }
 
 .wide-chart {
@@ -926,6 +991,20 @@ footer a {
   .word-card {
     width: min(100% - 32px, 720px);
     margin-inline: auto;
+  }
+
+  .hotspot-scroll {
+    --hotspot-scroll-distance: 460px;
+  }
+
+  .hotspot-scroll .wide-chart {
+    top: 58px;
+    padding: 24px 0 34px;
+  }
+
+  .hotspot-scroll .chart-viz svg {
+    width: 100%;
+    max-height: calc(100vh - 210px);
   }
 
   .chart-band .media-card {
