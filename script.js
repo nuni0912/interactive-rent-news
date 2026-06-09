@@ -216,17 +216,11 @@ const drawWordChart = (root, tone) => {
         { text: "獨立套房 + 精裝 + 近捷運 + 有電梯 + 不可寵", value: 13.0 },
         { text: "獨立套房 + 精裝 + 近捷運 + 有電梯 + 可養寵", value: 12.2 },
       ];
-  const positions = [
-    [760, 155, 0], [760, 270, 0], [760, 378, 0], [760, 485, 0], [640, 590, 0],
-    [1030, 600, 0], [450, 478, 0], [1090, 365, 0], [420, 265, 0], [1080, 245, 0],
-    [360, 650, 0], [1130, 720, 0], [215, 390, -90], [1275, 470, -90], [330, 135, 0],
-    [1220, 140, 0], [500, 735, 0], [1050, 115, 0], [240, 555, 0], [940, 705, 0],
-  ];
   const values = data.map((item) => item.value);
   const minValue = Math.min(...values);
   const maxValue = Math.max(...values);
-  const minSize = 20;
-  const maxSize = blue ? 50 : 49;
+  const minSize = 21;
+  const maxSize = blue ? 38 : 37;
   const sizeFor = (value) => {
     const ratio = (Math.sqrt(value) - Math.sqrt(minValue)) / (Math.sqrt(maxValue) - Math.sqrt(minValue));
     return minSize + ratio * (maxSize - minSize);
@@ -235,15 +229,25 @@ const drawWordChart = (root, tone) => {
   addText(svg, { x: 40, y: 54, class: "chart-title" }, blue ? "8k-18k 有漲物件條件組合" : "2k-18k 易遭調漲組合排行");
   addText(svg, { x: 40, y: 92, class: "chart-note" }, blue ? "字體越大代表筆數越多" : "字體越大代表調漲幅度越高");
   data.forEach((item, i) => {
-    const [x, y, rotate] = positions[i];
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = col === 0 ? 58 : 772;
+    const y = 145 + row * 63;
     const size = sizeFor(item.value);
     const opacity = Math.max(0.32, 1 - i * 0.032);
     const group = svgEl("g", {
       class: `chart-word ${blue ? "blue" : "red"}${i < 3 ? " top-rank" : ""}`,
       style: `--delay:${i * 95}ms; --word-opacity:${opacity}`,
-      transform: `translate(${x} ${y}) rotate(${rotate})`,
+      transform: `translate(${x} ${y})`,
     });
-    group.appendChild(svgEl("text", { "font-size": size.toFixed(1) }, item.text));
+    const label = svgEl("text", { "font-size": size.toFixed(1), "text-anchor": "start" }, item.text);
+    group.appendChild(label);
+    group.appendChild(svgEl("text", {
+      x: col === 0 ? 650 : 1378,
+      "font-size": Math.max(18, size * 0.72).toFixed(1),
+      "text-anchor": "end",
+      class: "chart-word-value",
+    }, blue ? `${item.value}筆` : `${item.value.toFixed(1)}%`));
     svg.appendChild(group);
   });
   root.appendChild(svg);
