@@ -77,23 +77,39 @@ a {
   z-index: 30;
   display: flex;
   gap: 6px;
+  width: min(1120px, calc(100% - 24px));
   padding: 8px;
+  overflow-x: auto;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   background: rgba(10, 16, 31, 0.58);
   backdrop-filter: blur(16px);
   transform: translateX(-50%);
+  transition: transform 260ms ease, opacity 260ms ease;
+  scrollbar-width: none;
+}
+
+.topbar::-webkit-scrollbar {
+  display: none;
+}
+
+.topbar.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -140%);
 }
 
 .topbar a {
-  min-width: 48px;
-  padding: 5px 12px;
+  flex: 1 0 max-content;
+  max-width: 235px;
+  padding: 5px 10px;
   border-radius: 999px;
   color: rgba(255, 255, 255, 0.82);
-  font-size: 14px;
+  font-size: clamp(10px, 1.05vw, 13px);
   line-height: 1.4;
   text-align: center;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .topbar a:hover,
@@ -220,7 +236,7 @@ h3 {
   display: block;
   margin-bottom: 10px;
   color: #fff;
-  font-size: clamp(54px, 7vw, 96px);
+  font-size: clamp(40px, 5vw, 64px);
   line-height: 1;
 }
 
@@ -239,7 +255,7 @@ h3 {
 }
 
 .hero-stats strong.count {
-  font-size: clamp(40px, 4.2vw, 56px);
+  font-size: clamp(40px, 5vw, 64px);
   letter-spacing: 0;
 }
 
