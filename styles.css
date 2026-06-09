@@ -571,8 +571,12 @@ figcaption {
 
 .chart-word text {
   dominant-baseline: middle;
-  text-anchor: middle;
   font-weight: 900;
+}
+
+.chart-word-value {
+  opacity: 0.7;
+  font-weight: 800;
 }
 
 .chart-word.red text {
@@ -587,11 +591,6 @@ figcaption {
   paint-order: stroke;
   stroke: rgba(255, 253, 250, 0.9);
   stroke-width: 3px;
-}
-
-.chart-viz.chart-on .chart-word.top-rank text {
-  animation: wordPulse 1500ms ease-in-out infinite;
-  animation-delay: calc(var(--delay, 0ms) + 760ms);
 }
 
 @keyframes drawLine {
@@ -623,19 +622,6 @@ figcaption {
 @keyframes fadeWord {
   to {
     opacity: var(--word-opacity, 1);
-  }
-}
-
-@keyframes wordPulse {
-  0%,
-  100% {
-    opacity: 1;
-    stroke-width: 3px;
-  }
-
-  50% {
-    opacity: 0.42;
-    stroke-width: 8px;
   }
 }
 
